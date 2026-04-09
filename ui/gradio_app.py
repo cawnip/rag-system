@@ -15,8 +15,8 @@ def upload_pdfs(files):
     os.makedirs(UPLOADS_PATH, exist_ok=True)
     saved = []
     for file in files:
-        dest = os.path.join(UPLOADS_PATH, os.path.basename(file.name))
-        shutil.copy(file.name, dest)
+        dest = os.path.join(UPLOADS_PATH, os.path.basename(file))
+        shutil.copy(file, dest)
         saved.append(dest)
     try:
         result = ingest(saved)
@@ -36,14 +36,15 @@ def get_status():
     n = index_size()
     if n == 0:
         return "No documents loaded."
-    return f"{n} chunks ready for querying."
+    return f"{n} chunks indexed and ready."
 
 
 def chat(message, history):
     if not message.strip():
         return history, ""
     if index_size() == 0:
-        history.append((message, "No documents have been uploaded yet. Please upload a PDF first."))
+        history.append({"role": "user", "content": message})
+        history.append({"role": "assistant", "content": "No documents have been uploaded yet. Please upload a PDF first."})
         return history, ""
     try:
         result = ask(message)
@@ -56,19 +57,19 @@ def chat(message, history):
             full_response = f"{answer}\n\nSources:\n{sources}"
         else:
             full_response = answer
-        history.append((message, full_response))
+        history.append({"role": "user", "content": message})
+        history.append({"role": "assistant", "content": full_response})
     except Exception as e:
-        history.append((message, f"Error: {str(e)}"))
+        history.append({"role": "user", "content": message})
+        history.append({"role": "assistant", "content": f"Error: {str(e)}"})
     return history, ""
 
 
 CSS = """
 footer { display: none !important; }
-.gr-button { font-weight: 500; }
-.status-text { font-size: 13px; color: #6b7280; }
 """
 
-with gr.Blocks(title="RAG System", theme=gr.themes.Default(), css=CSS) as demo:
+with gr.Blocks(title="RAG System", css=CSS) as demo:
 
     gr.Markdown("""
 # RAG System
@@ -95,7 +96,7 @@ Ask questions across multiple PDF documents and get answers with source citation
                 upload_btn = gr.Button("Upload & Process", variant="primary")
                 reset_btn = gr.Button("Clear All Documents", variant="stop")
 
-        upload_msg = gr.Textbox(label="Result", interactive=False, visible=True)
+        upload_msg = gr.Textbox(label="Result", interactive=False)
 
         upload_btn.click(
             upload_pdfs,
@@ -113,8 +114,7 @@ Ask questions across multiple PDF documents and get answers with source citation
         chatbot = gr.Chatbot(
             label="",
             height=400,
-            bubble_full_width=False,
-            show_label=False,
+            type="messages",
         )
 
         with gr.Row():
@@ -122,7 +122,6 @@ Ask questions across multiple PDF documents and get answers with source citation
                 placeholder="Ask a question about your documents...",
                 show_label=False,
                 scale=5,
-                container=False,
             )
             ask_btn = gr.Button("Send", variant="primary", scale=1)
 
