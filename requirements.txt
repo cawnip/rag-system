@@ -10,4 +10,4 @@ python-dotenv==1.0.1
 python-multipart==0.0.9
 pydantic==2.9.2
 gradio==4.44.0
-numpy==1.26.4
+numpy>=1.26.4
