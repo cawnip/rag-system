@@ -84,7 +84,12 @@ rag-system/
 │   ├── pipeline.py         # Ingest and ask pipelines
 │   └── schemas.py          # Pydantic request/response models
 ├── tests/
+│   ├── test_chunker.py
 │   └── test_pipeline.py
+├── notebooks/
+│   └── evaluation.ipynb     # RAGAS evaluation
+├── assets/
+│   └── demo.png
 ├── requirements.txt
 ├── Makefile
 └── .env.example
