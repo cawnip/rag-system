@@ -10,6 +10,8 @@ A production-ready Retrieval-Augmented Generation (RAG) pipeline that lets you u
 
 ![RAG System UI](assets/demo.png)
 
+**Live demo:** [huggingface.co/spaces/cawnip/rag-system](https://huggingface.co/spaces/cawnip/rag-system)
+
 ---
 
 ## Features
